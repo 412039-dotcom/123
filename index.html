@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文單字卡背誦 App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 導航欄 -->
+        <nav class="navbar">
+            <h1 class="logo">📚 Word Flash</h1>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-page="study">背單字</button>
+                <button class="nav-btn" data-page="manage">管理單字</button>
+            </div>
+        </nav>
+
+        <!-- 背單字頁面 -->
+        <div class="page" id="study-page">
+            <div class="study-container">
+                <div class="card-wrapper">
+                    <div class="card" id="flashcard">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-front-content">
+                                    <p class="label">英文單字</p>
+                                    <p class="word" id="card-word">Click to start</p>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-back-content">
+                                    <p class="label">中文翻譯</p>
+                                    <p class="translation" id="card-translation">點擊卡片翻譯</p>
+                                    <p class="pos" id="card-pos"></p>
+                                    <p class="example-label">例句：</p>
+                                    <p class="example" id="card-example"></p>
+                                    <p class="root-label">字根分析：</p>
+                                    <p class="root" id="card-root"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-prev" id="btn-prev">← 上一個</button>
+                    <span class="progress" id="progress">1 / 0</span>
+                    <button class="btn btn-next" id="btn-next">下一個 →</button>
+                </div>
+
+                <div class="stats">
+                    <p id="stats-text">尚未載入任何單字</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理頁面 -->
+        <div class="page" id="manage-page" style="display: none;">
+            <div class="manage-container">
+                <h2>新增單字</h2>
+                <form id="word-form" class="word-form">
+                    <div class="form-group">
+                        <label for="word-input">英文單字 *</label>
+                        <div class="input-group">
+                            <input type="text" id="word-input" placeholder="輸入英文單字" required>
+                            <button type="button" class="btn btn-auto" id="btn-auto-fill">自動填入</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="translation-input">中文翻譯 *</label>
+                        <input type="text" id="translation-input" placeholder="輸入中文翻譯" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pos-input">詞性</label>
+                        <input type="text" id="pos-input" placeholder="例：n. (名詞), v. (動詞), adj. (形容詞)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="example-input">例句</label>
+                        <textarea id="example-input" placeholder="輸入例句" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="root-input">字根分析</label>
+                        <textarea id="root-input" placeholder="輸入字根分析" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit">新增單字</button>
+                </form>
+
+                <h2 style="margin-top: 40px;">單字列表</h2>
+                <div class="word-list" id="word-list">
+                    <p style="text-align: center; color: #999;">單字列表會在這裡顯示</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 載入提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
