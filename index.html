@@ -4,54 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>英文單字卡背誦 App</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Tailwind config for CDN runtime (keeps visual theme consistent during development) -->
+    <script>
+      tailwind = window.tailwind || {};
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              surface: '#0b0f12',       // very dark background
+              surface-2: '#0f1720',     // slightly lighter surface
+              card: '#0b1220',          // card deep tone
+              muted: '#9aa6b2',         // muted text
+              accent: '#7c3aed',        // purple accent (glow)
+              glow: '#2a2f48',          // subtle glow/backdrop
+              highlight: '#e9d5ff'      // highlight for interactive text
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      /* Minimal flip behaviour (visual-only). Colors are applied via Tailwind classes. */
+      .card-wrapper { perspective: 1100px; }
+      .card { width: 20rem; height: 12rem; }
+      .card-inner { transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
+      .card.is-flipped .card-inner { transform: rotateY(180deg); }
+      .card-front, .card-back {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .card-back { transform: rotateY(180deg); }
+    </style>
+
 </head>
-<body>
-    <div class="container">
+<body class="bg-surface text-gray-100 antialiased">
+    <div class="container max-w-4xl mx-auto p-6">
         <!-- 導航欄 -->
-        <nav class="navbar">
-            <h1 class="logo">📚 Word Flash</h1>
-            <div class="nav-buttons">
-                <button class="nav-btn active" data-page="study">背單字</button>
-                <button class="nav-btn" data-page="manage">管理單字</button>
+        <nav class="navbar flex items-center justify-between mb-6">
+            <h1 class="logo text-2xl font-semibold text-accent">📚 Word Flash</h1>
+            <div class="nav-buttons space-x-2">
+                <button class="nav-btn active px-3 py-2 rounded-md text-sm font-medium bg-surface-2 text-highlight hover:bg-glow" data-page="study">背單字</button>
+                <button class="nav-btn px-3 py-2 rounded-md text-sm font-medium bg-transparent text-muted hover:text-highlight hover:bg-glow" data-page="manage">管理單字</button>
             </div>
         </nav>
 
         <!-- 背單字頁面 -->
         <div class="page" id="study-page">
-            <div class="study-container">
-                <div class="card-wrapper">
-                    <div class="card" id="flashcard">
-                        <div class="card-inner">
-                            <div class="card-front">
+            <div class="study-container flex flex-col items-center">
+                <div class="card-wrapper mb-6 card-wrapper">
+                    <div class="card rounded-xl shadow-lg border border-transparent card bg-card">
+                        <div class="card-inner rounded-xl overflow-hidden">
+                            <div class="card-front bg-gradient-to-b from-surface-2 to-transparent rounded-xl text-center text-gray-50 card-front">
                                 <div class="card-front-content">
-                                    <p class="label">英文單字</p>
-                                    <p class="word" id="card-word">Click to start</p>
+                                    <p class="label text-sm text-muted">英文單字</p>
+                                    <p class="word text-3xl font-bold tracking-wide mt-2" id="card-word">Click to start</p>
                                 </div>
                             </div>
-                            <div class="card-back">
-                                <div class="card-back-content">
-                                    <p class="label">中文翻譯</p>
-                                    <p class="translation" id="card-translation">點擊卡片翻譯</p>
-                                    <p class="pos" id="card-pos"></p>
-                                    <p class="example-label">例句：</p>
-                                    <p class="example" id="card-example"></p>
-                                    <p class="root-label">字根分析：</p>
-                                    <p class="root" id="card-root"></p>
+                            <div class="card-back bg-gradient-to-b from-glow to-card rounded-xl text-left p-4 card-back">
+                                <div class="card-back-content text-sm text-gray-200">
+                                    <p class="label text-xs text-muted">中文翻譯</p>
+                                    <p class="translation text-lg font-medium mt-1" id="card-translation">點擊卡片翻譯</p>
+                                    <p class="pos text-sm text-muted mt-2" id="card-pos"></p>
+                                    <p class="example-label text-xs text-muted mt-3">例句：</p>
+                                    <p class="example text-sm text-gray-200" id="card-example"></p>
+                                    <p class="root-label text-xs text-muted mt-3">字根分析：</p>
+                                    <p class="root text-sm text-gray-200" id="card-root"></p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="controls">
-                    <button class="btn btn-prev" id="btn-prev">← 上一個</button>
-                    <span class="progress" id="progress">1 / 0</span>
-                    <button class="btn btn-next" id="btn-next">下一個 →</button>
+                <div class="controls flex items-center gap-4">
+                    <button class="btn btn-prev px-4 py-2 rounded-md bg-transparent border border-glow text-muted hover:text-highlight" id="btn-prev">← 上一個</button>
+                    <span class="progress text-sm text-muted" id="progress">1 / 0</span>
+                    <button class="btn btn-next px-4 py-2 rounded-md bg-accent text-black font-medium shadow-md hover:brightness-105" id="btn-next">下一個 →</button>
                 </div>
 
-                <div class="stats">
-                    <p id="stats-text">尚未載入任何單字</p>
+                <div class="stats mt-4">
+                    <p id="stats-text" class="text-xs text-muted">尚未載入任何單字</p>
                 </div>
             </div>
         </div>
@@ -59,41 +99,41 @@
         <!-- 管理頁面 -->
         <div class="page" id="manage-page" style="display: none;">
             <div class="manage-container">
-                <h2>新增單字</h2>
-                <form id="word-form" class="word-form">
+                <h2 class="text-xl font-semibold text-gray-100">新增單字</h2>
+                <form id="word-form" class="word-form mt-4 space-y-4">
                     <div class="form-group">
-                        <label for="word-input">英文單字 *</label>
-                        <div class="input-group">
-                            <input type="text" id="word-input" placeholder="輸入英文單字" required>
-                            <button type="button" class="btn btn-auto" id="btn-auto-fill">自動填入</button>
+                        <label for="word-input" class="block text-sm text-muted">英文單字 *</label>
+                        <div class="input-group flex items-center gap-2 mt-1">
+                            <input type="text" id="word-input" placeholder="輸入英文單字" required class="w-full px-3 py-2 rounded-md bg-surface-2 text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent">
+                            <button type="button" class="btn btn-auto px-3 py-2 rounded-md bg-transparent border border-glow text-muted hover:text-highlight" id="btn-auto-fill">自動填入</button>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="translation-input">中文翻譯 *</label>
-                        <input type="text" id="translation-input" placeholder="輸入中文翻譯" required>
+                        <label for="translation-input" class="block text-sm text-muted">中文翻譯 *</label>
+                        <input type="text" id="translation-input" placeholder="輸入中文翻譯" required class="w-full px-3 py-2 rounded-md bg-surface-2 text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent">
                     </div>
 
                     <div class="form-group">
-                        <label for="pos-input">詞性</label>
-                        <input type="text" id="pos-input" placeholder="例：n. (名詞), v. (動詞), adj. (形容詞)">
+                        <label for="pos-input" class="block text-sm text-muted">詞性</label>
+                        <input type="text" id="pos-input" placeholder="例：n. (名詞), v. (動詞), adj. (形容詞)" class="w-full px-3 py-2 rounded-md bg-surface-2 text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent">
                     </div>
 
                     <div class="form-group">
-                        <label for="example-input">例句</label>
-                        <textarea id="example-input" placeholder="輸入例句" rows="3"></textarea>
+                        <label for="example-input" class="block text-sm text-muted">例句</label>
+                        <textarea id="example-input" placeholder="輸入例句" rows="3" class="w-full px-3 py-2 rounded-md bg-surface-2 text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="root-input">字根分析</label>
-                        <textarea id="root-input" placeholder="輸入字根分析" rows="3"></textarea>
+                        <label for="root-input" class="block text-sm text-muted">字根分析</label>
+                        <textarea id="root-input" placeholder="輸入字根分析" rows="3" class="w-full px-3 py-2 rounded-md bg-surface-2 text-gray-100 border border-transparent focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-submit">新增單字</button>
+                    <button type="submit" class="btn btn-submit px-4 py-2 rounded-md bg-accent text-black font-medium shadow-md hover:brightness-105">新增單字</button>
                 </form>
 
-                <h2 style="margin-top: 40px;">單字列表</h2>
-                <div class="word-list" id="word-list">
+                <h2 class="text-xl font-semibold text-gray-100" style="margin-top: 40px;">單字列表</h2>
+                <div class="word-list mt-4" id="word-list">
                     <p style="text-align: center; color: #999;">單字列表會在這裡顯示</p>
                 </div>
             </div>
@@ -101,7 +141,7 @@
     </div>
 
     <!-- 載入提示 -->
-    <div class="toast" id="toast"></div>
+    <div class="toast fixed bottom-6 right-6 bg-surface-2 text-gray-100 px-4 py-2 rounded-md shadow-lg" id="toast"></div>
 
     <script src="script.js"></script>
 </body>
